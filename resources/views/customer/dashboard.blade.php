@@ -18,10 +18,8 @@
             </button>
         </form>
     </header>
-
-    <main class="p-6">
-        <!-- Dashboard content goes here -->
-        <p>Welcome, {{ Auth::user()->name }}</p>
-    </main>
+    @section('content')
+    <p>Welcome, {{ Auth::user()->name }}</p>
+    @endsection
 </body>
 </html>

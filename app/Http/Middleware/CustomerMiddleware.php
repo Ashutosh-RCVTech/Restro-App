@@ -20,8 +20,7 @@ class CustomerMiddleware
         if (Auth::check() && Auth::user()->role === 'customer') {
             return $next($request);
         }
-
-        abort(403, 'Access denied. Customers only.');
+        
         return redirect()->route('home')->with('error', 'Access denied. Customers only.');
     }
 }
