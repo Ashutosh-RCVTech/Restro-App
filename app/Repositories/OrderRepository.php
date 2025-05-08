@@ -17,26 +17,27 @@ class orderRepository implements OrderRepositoryInterface
         return Order::with(['customer', 'items.foodItem'])->find($id);
     }
 
+    public function getOrdersByCustomer($customerId): Collection
+    {
+        return Order::where('customer_id', $customerId)->with(['customer', 'items.foodItem'])->get();
+    }
+
     public function create(array $data): Order
     {
         return Order::create($data);
     }
 
     
-        public function update($id, array $data): Order
-        {
-            $order = Order::findOrFail($id);
-            $order->update($data);
-            return $order;
-        }
+    public function update($id, array $data): Order
+    {
+        $order = Order::findOrFail($id);
+        $order->update($data);
+        return $order;
+    }
     
-        public function delete($id): bool
-        {
-            return Order::destroy($id) > 0;
-        }
-    
-        public function getOrdersByCustomer($customerId): Collection
-        {
-            return Order::where('customer_id', $customerId)->with(['customer', 'items.foodItem'])->get();
-        }
+    public function delete($id): bool
+    {
+        return Order::destroy($id) > 0;
+    }    
+        
 }

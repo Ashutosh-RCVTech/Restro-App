@@ -17,6 +17,9 @@ use App\Repositories\Interfaces\OrderItemRepositoryInterface;
 use App\Repositories\OrderItemRepository;
 use App\Services\Interfaces\OrderServiceInterface;
 use App\Services\OrderService;
+use App\Services\Interfaces\OrderItemServiceInterface;
+use App\Services\OrderItemService;
+
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -35,6 +38,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CategoryServiceInterface::class, CategoryService::class);
         $this->app->bind(FoodItemServiceInterface::class, FoodItemService::class);
         $this->app->bind(OrderServiceInterface::class, OrderService::class);
+        $this->app->bind(OrderItemServiceInterface::class, OrderItemService::class);
 
     }
 

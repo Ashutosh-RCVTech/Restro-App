@@ -2,15 +2,14 @@
 
 namespace App\Repositories\Interfaces;
 
-use App\Models\Order;
 use Illuminate\Database\Eloquent\Collection;
 
 interface OrderRepositoryInterface
 {
-    public function getAllOrders(): Collection;
-    public function find($id): ?Order;
-    public function create(array $data): Order;
-    public function update($id, array $data): Order;
-    public function delete($id): bool;
-    public function getOrdersByCustomer($customerId): Collection;
+    public function getAllOrders(): Collection; // Get all orders
+    public function find($id): ?Order; // Find an order by ID
+    public function getOrdersByCustomer($customerId): Collection; // Get all orders for a specific customer
+    public function create(array $data): Order; // Create a new order
+    public function update($id, array $data): Order; // Update an existing order
+    public function delete($id): bool; // Delete an order
 }

@@ -2,22 +2,29 @@
 
 namespace App\Repositories;
 
-use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Database\Eloquent\Collection;
+use App\Repositories\Interfaces\OrderItemRepositoryInterface;
 
 class OrderItemRepository implements OrderItemRepositoryInterface
 {
-    public function createMany(array $data): bool
+    public function create(array $data): OrderItem
     {
-        // Implementation for creating multiple order items
-        // This is just a placeholder, actual implementation will depend on your database structure and ORM
-        return OrderItem::insert($items);
+        return OrderItem::create($data);
     }
 
-    public function getbyOrderId($orderId): ?Order
+    public function createMany(array $data): bool
     {
-        // Implementation for retrieving an order by its ID
-        // This is just a placeholder, actual implementation will depend on your database structure and ORM
-        return Order::with(['customer', 'items.foodItem'])->where('id', $orderId)->first();
+        return OrderItem::insert($data); // assumes bulk safe
+    }
+
+    public function getByOrderId($orderId): Collection
+    {
+        return OrderItem::where('order_id', $orderId)->with('foodItem')->get();
+    }
+
+    public function getById($id): ?OrderItem
+    {
+        return OrderItem::with('foodItem')->find($id);
     }
 }

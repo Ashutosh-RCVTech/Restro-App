@@ -55,8 +55,19 @@ class OrderService implements OrderServiceInterface
         return $this->orderRepository->find($id);
     }
 
-    public function store(array $data): Order
+    public function updateStatus($id, $status): bool
     {
-        return $this->orderRepository->create($data);
+        return $this->orderRepository->update($id, ['status' => $status]) ? true : false;
     }
+
+    public function updatePaymentStatus($id, $status): bool
+    {
+        return $this->orderRepository->update($id, ['payment_status' => $status]) ? true : false;
+    }
+
+
+    // public function store(array $data): Order
+    // {
+    //     return $this->orderRepository->create($data);
+    // }
 }
