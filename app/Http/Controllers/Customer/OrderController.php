@@ -43,37 +43,38 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'items' => 'required|array',
-            'items.*.selected' => 'required|boolean',
+            'items.*.selected' => 'required|in:1', // ← updated
             'items.*.quantity' => 'required|integer|min:1',
         ]);
 
         $orderData = [
             'customer_id' => Auth::id(),
-            'status' => 'pending',  // Default status
-            'payment_status' => 'unpaid',  // Default payment status
+            'status' => 'pending',
+            'payment_status' => 'unpaid',
         ];
 
-        // Create the order first
-        $order = Order::create($orderData);
+        $itemsToInsert = [];
 
-        // Add selected items to the order
         foreach ($validated['items'] as $foodItemId => $itemData) {
-            if ($itemData['selected'] == 1) {
+            if (isset($itemData['selected']) && $itemData['selected'] == '1') {
                 $foodItem = FoodItem::find($foodItemId);
-
-                // Create an OrderItem for each selected food item
                 if ($foodItem) {
-                    OrderItem::create([
-                        'order_id' => $order->id,
+                    $itemsToInsert[] = [
                         'food_item_id' => $foodItem->id,
                         'quantity' => $itemData['quantity'],
-                        'price' => $foodItem->price,  // Store price in OrderItem
-                    ]);
+                        'price' => $foodItem->price,
+                    ];
                 }
             }
         }
 
-        // Redirect to the customer's orders page
+        if (empty($itemsToInsert)) {
+            return back()->with('error', 'No valid items selected.');
+        }
+
+        $this->orderService->placeOrder($orderData, $itemsToInsert);
+
         return redirect()->route('customer.orders.index')->with('success', 'Your order has been placed successfully.');
     }
+
 }

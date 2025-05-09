@@ -12,37 +12,53 @@ use App\Http\Controllers\Customer\FoodItemController as CustomerFoodItemControll
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
 
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
 
+Route::get('/', function () {
+    return view('welcome');
+})->name('home');
 
-    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
-    Route::post('/login', [LoginController::class, 'login'])->name('login');
-    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register.form');
-    Route::post('/register', [RegisterController::class, 'register'])->name('register');
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
+Route::post('/login', [LoginController::class, 'login'])->name('login');
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register.form');
+Route::post('/register', [RegisterController::class, 'register'])->name('register');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-    Route::group(['middleware' => ['auth', AdminMiddleware::class]], function () {
-        Route::get('/admin/dashboard', function () {
-            return view('layouts.admin');
-        })->name('admin.dashboard');
-    
-        Route::resource('admin/categories', AdminCategoryController::class)->names('admin.categories');
-        Route::resource('admin/food-items', FoodItemController::class)->names('admin.food_items');
-        Route::resource('admin/orders', AdminOrderController::class)->only(['index', 'show', 'update'])->names('admin.orders');
-    });
+/*
+|--------------------------------------------------------------------------
+| Admin Routes (Protected by AdminMiddleware)
+|--------------------------------------------------------------------------
+*/
 
+Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('layouts.admin');
+    })->name('dashboard');
 
-    Route::group(['middleware' => ['auth', CustomerMiddleware::class]], function () {
-        Route::get('/customer/dashboard', function () {
-            return view('layouts.customer');
-        })->name('customer.dashboard');
+    Route::resource('categories', AdminCategoryController::class)->names('categories');
+    Route::resource('food-items', FoodItemController::class)->names('food_items');
+    Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update'])->names('orders');
+});
 
-        Route::get('/customer/categories', [CustomerCategoryController::class, 'index'])->name('customer.categories.index');
-        Route::get('/customer/food-items', [CustomerFoodItemController::class, 'index'])->name('customer.food_items.index');
+/*
+|--------------------------------------------------------------------------
+| Customer Routes (Protected by CustomerMiddleware)
+|--------------------------------------------------------------------------
+*/
 
-        Route::get('/customer/orders', [CustomerOrderController::class, 'index'])->name('customer.orders.index');
-        Route::get('/customer/orders/{id}', [CustomerOrderController::class, 'show'])->name('customer.orders.show');
-    });
+Route::middleware(['auth', CustomerMiddleware::class])->prefix('customer')->name('customer.')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('layouts.customer');
+    })->name('dashboard');
 
-    Route::get('/', function () {
-        return view('welcome');
-    })->name('home');
+    Route::get('/categories', [CustomerCategoryController::class, 'index'])->name('categories.index');
+    Route::get('/food-items', [CustomerFoodItemController::class, 'index'])->name('food_items.index');
+
+    Route::get('/orders', [CustomerOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{id}', [CustomerOrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders', [CustomerOrderController::class, 'store'])->name('orders.store'); // ✅ Added this line
+});
